@@ -1,11 +1,10 @@
 from flask import Flask, request, jsonify
 import joblib
-import pandas as pd
 
 app = Flask(__name__)
 
 # Load your trained model (same name from Step 1)
-model = joblib.load("salary_predict_model.ml")
+model = joblib.load("salary_predict_model.pkl")
 
 # Expected input fields — must match the model training columns
 EXPECTED_COLS = [
@@ -35,11 +34,10 @@ def predict():
     if missing:
         return jsonify({"error": f"Missing keys: {missing}", "got": data}), 400
 
-    # build dataframe in correct order
+    # build 2D row in correct order (no pandas needed)
     row = [[data[col] for col in EXPECTED_COLS]]
-    df = pd.DataFrame(row, columns=EXPECTED_COLS)
 
-    pred = model.predict(df)[0]
+    pred = model.predict(row)[0]
     return jsonify({"prediction": float(pred)})
 
 if __name__ == "__main__":
